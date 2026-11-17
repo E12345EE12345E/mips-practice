@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PRNG > is deterministic and versioned 1`] = `
+[
+  326309721,
+  116659159,
+  826398447,
+]
+`;
