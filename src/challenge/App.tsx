@@ -206,8 +206,8 @@ export default function App() {
                   key={i}
                   style={
                     {
-                      "--x": `${Math.cos(i) * 180}px`,
-                      "--y": `${Math.sin(i) * 150}px`,
+                      "--x": `${Math.cos(i) * 216}px`,
+                      "--y": `${Math.sin(i) * 180}px`,
                     } as CSSProperties
                   }
                 />

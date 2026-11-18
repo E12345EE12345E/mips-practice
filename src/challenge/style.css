@@ -13,7 +13,7 @@ button,
 a,
 input,
 textarea {
-  outline-offset: 6px;
+  outline-offset: 7px;
 }
 button {
   cursor: pointer;
@@ -26,12 +26,12 @@ button:disabled {
   color: var(--text);
   min-height: 100dvh;
   font:
-    16px/1.6 "Courier New",
+    19px/1.6 "Courier New",
     monospace;
-  padding: 24px;
+  padding: 29px;
 }
 .home {
-  min-height: calc(100dvh - 48px);
+  min-height: calc(100dvh - 58px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,17 +40,17 @@ button:disabled {
   position: relative;
 }
 .eyebrow {
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-size: 13px;
+  letter-spacing: 4px;
   color: var(--muted);
 }
 h1 {
-  font-size: clamp(56px, 9vw, 116px);
+  font-size: clamp(67px, 11vw, 139px);
   line-height: 0.95;
-  letter-spacing: -5px;
+  letter-spacing: -6px;
   text-transform: uppercase;
-  margin: 30px 0;
-  text-shadow: 4px 4px 0 var(--border);
+  margin: 36px 0;
+  text-shadow: 5px 5px 0 var(--border);
   font-weight: 900;
 }
 h1 span {
@@ -58,16 +58,16 @@ h1 span {
 }
 .intro {
   color: var(--context);
-  margin: 0 0 38px;
+  margin: 0 0 46px;
 }
 .start {
   background: var(--target);
   color: var(--background);
   border: 0;
-  box-shadow: 6px 6px 0 var(--border);
-  padding: 16px 65px;
+  box-shadow: 7px 7px 0 var(--border);
+  padding: 19px 78px;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 29px;
   text-transform: uppercase;
 }
 .start:hover {
@@ -75,24 +75,24 @@ h1 span {
 }
 a {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 16px;
 }
 .home a {
-  margin-top: 36px;
+  margin-top: 43px;
 }
 .rules {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
-  margin-top: 32px;
+  margin-top: 38px;
 }
 header {
   display: flex;
-  gap: 30px;
+  gap: 36px;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: auto;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 20px;
+  padding-bottom: 24px;
 }
 header a {
   margin-right: auto;
@@ -100,32 +100,32 @@ header a {
   text-decoration: none;
 }
 header strong {
-  font-size: 24px;
+  font-size: 29px;
   color: var(--context);
 }
 header .urgent {
   color: var(--error);
 }
 .arena {
-  max-width: 1200px;
-  margin: 40px auto;
+  max-width: 1440px;
+  margin: 48px auto;
   text-align: center;
 }
 .pixel {
   background: var(--panel);
   border: 2px solid var(--border);
-  box-shadow: 4px 4px 0 var(--border);
+  box-shadow: 5px 5px 0 var(--border);
 }
 .problem {
-  max-width: 800px;
-  margin: 20px auto 30px;
+  max-width: 960px;
+  margin: 24px auto 36px;
   text-align: left;
-  padding: 24px;
+  padding: 29px;
   animation: appear 0.2s ease-out;
 }
 pre {
   font:
-    15px/1.8 "Courier New",
+    18px/1.8 "Courier New",
     monospace;
   margin: 0;
   white-space: pre-wrap;
@@ -141,80 +141,80 @@ mark {
 }
 .columns pre + pre {
   border-left: 1px solid var(--border);
-  padding-left: 24px;
+  padding-left: 29px;
 }
 .console {
   border-top: 1px solid var(--border);
-  margin-top: 20px;
-  padding-top: 12px;
+  margin-top: 24px;
+  padding-top: 14px;
   color: var(--text);
 }
 small {
   display: block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .code-row {
   display: grid;
   grid-template-columns: 1fr 1.6fr 1fr;
-  gap: 20px;
+  gap: 24px;
   text-align: left;
 }
 .code-row aside {
-  padding: 16px;
+  padding: 19px;
   align-self: start;
 }
 .code-row small {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 .code-row textarea {
-  min-height: 270px;
+  min-height: 324px;
   resize: vertical;
   background: var(--panel);
   color: var(--target);
   border: 2px solid var(--target);
-  padding: 18px;
+  padding: 22px;
   line-height: 1.6;
   tab-size: 4;
 }
 .contract {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--context);
 }
 .trace-answer {
   display: inline-block;
-  padding: 24px;
-  min-width: 280px;
+  padding: 29px;
+  min-width: 336px;
 }
 .trace-answer input {
   display: block;
   background: var(--background);
   border: 1px solid var(--target);
   color: var(--target);
-  padding: 12px;
-  max-width: 230px;
-  margin: 12px auto 0;
+  padding: 14px;
+  max-width: 276px;
+  margin: 14px auto 0;
   text-align: center;
 }
 .cells {
   display: flex;
-  gap: 7px;
-  margin: 12px 0;
+  gap: 8px;
+  margin: 14px 0;
 }
 .cells input {
-  width: 48px;
-  padding: 12px 2px;
+  width: 58px;
+  padding: 14px 2px;
 }
 .status {
-  min-height: 26px;
-  font-size: 12px;
+  min-height: 31px;
+  font-size: 14px;
   color: var(--muted);
 }
 .skip {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--muted);
-  padding: 8px 15px;
+  padding: 10px 18px;
 }
 .success {
   pointer-events: none;
@@ -232,8 +232,8 @@ small {
 }
 .particles i {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background: var(--target);
   animation: burst 0.4s forwards;
 }
@@ -254,19 +254,19 @@ small {
 @keyframes appear {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
 }
 @keyframes success {
   to {
     opacity: 0;
-    transform: translateY(50px);
+    transform: translateY(60px);
     color: var(--success);
   }
 }
-@media (max-width: 800px) {
+@media (max-width: 960px) {
   .challenge {
-    padding: 16px;
+    padding: 19px;
   }
   .code-row {
     grid-template-columns: 1fr;
@@ -279,20 +279,20 @@ small {
     min-width: 0;
   }
   .columns pre {
-    min-width: 180px;
-    font-size: 12px;
+    min-width: 216px;
+    font-size: 14px;
   }
   .problem {
-    padding: 16px;
+    padding: 19px;
   }
   .cells {
-    gap: 3px;
+    gap: 4px;
   }
   .cells input {
-    width: 32px;
+    width: 38px;
   }
   h1 {
-    letter-spacing: -3px;
+    letter-spacing: -4px;
   }
   .eyebrow {
     letter-spacing: 1px;
