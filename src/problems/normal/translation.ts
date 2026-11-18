@@ -5,10 +5,10 @@ const base: typeof snippetBase = (family, a, b) => ({
   category: "c_snippet_to_mips_normal",
 });
 
-const arithmetic = (id: string, three: boolean): Family => ({
-  id,
+const setThreeIntsPerformOp: Family = {
+  id: "set_three_ints_perform_op",
   generate(a, b) {
-    const p = base(id, a, b);
+    const p = base("set_three_ints_perform_op", a, b);
     const k = 3;
     const outer = ["-", "+", "*"][b % 3];
     const inner = ["*", "+", "-"][(a + b) % 3];
@@ -19,18 +19,17 @@ const arithmetic = (id: string, three: boolean): Family => ({
       "-": "sub",
       "*": "mul",
     };
-    p.cTarget = `    a = ${a};\n    b = ${b};\n${three ? "    int c = 3;\n" : ""}    a = b ${outer} (a ${inner} ${three ? "c" : k});`;
+    p.cTarget = `    a = ${a};\n    b = ${b};\n    int c = 3;\n    a = b ${outer} (a ${inner} c);`;
     p.reference = `li $t0, ${a}\nli $t1, ${b}\nli $t2, 3\n${mnemonic[inner]} $t0, $t0, $t2\n${mnemonic[outer]} $t0, $t1, $t0`;
     p.answer = op(b, op(a, k, inner), outer);
     p.expectedOutput = String(p.answer);
     return p;
   },
-});
+};
 
 /** Longer translation exercises, reserved for future modes. */
 export const normalTranslationFamilies: Family[] = [
-  arithmetic("set_two_ints_perform_op", false),
-  arithmetic("set_three_ints_perform_op", true),
+  setThreeIntsPerformOp,
   {
     id: "counted_sum_loop",
     generate(a, b) {

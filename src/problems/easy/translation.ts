@@ -1,4 +1,24 @@
 import { base, type Family } from "../snippets";
+const setTwoIntsPerformOp: Family = {
+  id: "set_two_ints_perform_op",
+  generate(a, b) {
+    const p = base("set_two_ints_perform_op", a, b);
+    const outer = ["-", "+", "*"][b % 3];
+    const inner = ["*", "+", "-"][(a + b) % 3];
+    const op = (x: number, y: number, operator: string) =>
+      operator === "+" ? x + y : operator === "-" ? x - y : x * y;
+    const mnemonic: Record<string, string> = {
+      "+": "add",
+      "-": "sub",
+      "*": "mul",
+    };
+    p.cTarget = `    a = ${a};\n    b = ${b};\n    a = b ${outer} (a ${inner} 3);`;
+    p.reference = `li $t0, ${a}\nli $t1, ${b}\nli $t2, 3\n${mnemonic[inner]} $t0, $t0, $t2\n${mnemonic[outer]} $t0, $t1, $t0`;
+    p.answer = op(b, op(a, 3, inner), outer);
+    p.expectedOutput = String(p.answer);
+    return p;
+  },
+};
 const simple = (
   id: string,
   c: (a: number, b: number) => string,
@@ -19,6 +39,7 @@ const simple = (
   },
 });
 export const translationFamilies: Family[] = [
+  setTwoIntsPerformOp,
   simple(
     "set_one_int",
     (_a, b) => `a = ${b};`,
