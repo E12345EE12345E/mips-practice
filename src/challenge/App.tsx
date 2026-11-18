@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { generateProblem } from "../problems/easy/registry";
-import type { EasyProblem } from "../problems/easy/types";
+import type { SnippetProblem } from "../problems/snippets";
 import { CONFIG, PALETTE } from "./palette";
 import "./style.css";
 import { Grader } from "./Grader";
@@ -35,7 +35,7 @@ export default function App() {
     | "settling"
     | "finished"
   >("home");
-  const [problem, setProblem] = useState<EasyProblem | null>(null);
+  const [problem, setProblem] = useState<SnippetProblem | null>(null);
   const [source, setSource] = useState("");
   const [cells, setCells] = useState<string[]>([]);
   const [score, setScore] = useState(0);

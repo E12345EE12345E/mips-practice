@@ -19,4 +19,4 @@ export function getProblemType(id: string): ProblemEntry | undefined {
 }
 
 /** The legacy application exclusively consumes this category. */
-export const NORMAL_CATEGORY = { id: "c_snippet_to_mips_normal", families: PROBLEM_TYPES } as const;
+export const LEGACY_CATEGORY = { id: "c_snippet_to_mips_legacy", families: PROBLEM_TYPES } as const;

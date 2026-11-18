@@ -1,6 +1,6 @@
-import type { EasyProblem } from "../problems/easy/types";
+import type { SnippetProblem } from "../problems/snippets";
 interface Request {
-  problem: EasyProblem;
+  problem: SnippetProblem;
   source: string;
   revision: number;
 }

@@ -1,9 +1,11 @@
-export type EasyCategory =
-  "c_snippet_to_mips_easy" | "mips_snippet_behavior_tracing_easy";
-export interface EasyProblem {
+export type SnippetCategory =
+  | "c_snippet_to_mips_easy"
+  | "c_snippet_to_mips_normal"
+  | "mips_snippet_behavior_tracing_easy";
+export interface SnippetProblem {
   id: string;
   family: string;
-  category: EasyCategory;
+  category: SnippetCategory;
   cBefore: string;
   cTarget: string;
   cAfter: string;
@@ -23,9 +25,9 @@ export interface EasyProblem {
 }
 export type Family = {
   id: string;
-  generate(a: number, b: number): EasyProblem;
+  generate(a: number, b: number): SnippetProblem;
 };
-export const base = (family: string, a: number, b: number): EasyProblem => ({
+export const base = (family: string, a: number, b: number): SnippetProblem => ({
   id: `${family}:${a}:${b}`,
   family,
   category: "c_snippet_to_mips_easy",

@@ -2,12 +2,15 @@ import { describe, it, expect } from "vitest";
 import {
   translationFamilies,
   tracingFamilies,
+  generateProblem,
 } from "../../src/problems/easy/registry";
+import { normalTranslationFamilies } from "../../src/problems/normal/registry";
+import { LEGACY_CATEGORY } from "../../src/problems/registry";
 import { gradeFragment } from "../../src/challenge/grade";
 import { assemble } from "../../src/mips/assembler";
 import { Machine } from "../../src/mips/machine";
-describe("easy translation families", () => {
-  for (const f of translationFamilies)
+describe("translation references", () => {
+  for (const f of [...translationFamilies, ...normalTranslationFamilies])
     it(f.id, () => {
       for (const [a, b] of [
         [1, 1],
@@ -23,6 +26,45 @@ describe("easy translation families", () => {
         expect(gradeFragment(p, "li $v0, 10\nsyscall").passed).toBe(false);
       }
     });
+});
+describe("translation difficulty pools", () => {
+  it("keeps every easy reference within three typed lines and longer families normal", () => {
+    const ids = [...translationFamilies, ...normalTranslationFamilies].map((f) => f.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const [families, category, maximum] of [
+      [translationFamilies, "c_snippet_to_mips_easy", 3],
+      [normalTranslationFamilies, "c_snippet_to_mips_normal", Infinity],
+    ] as const) {
+      for (const family of families) {
+        for (let a = 1; a <= 19; a++) {
+          for (let b = 1; b <= 19; b++) {
+            const problem = family.generate(a, b);
+            const lines = problem.reference.split("\n").filter((line) => line.trim()).length;
+            expect(problem.category).toBe(category);
+            expect(lines).toBeLessThanOrEqual(maximum);
+            if (category === "c_snippet_to_mips_normal") expect(lines).toBeGreaterThan(3);
+          }
+        }
+      }
+    }
+  });
+  it("reserves the five longer families and excludes them from speedruns", () => {
+    expect(normalTranslationFamilies.map((f) => f.id)).toEqual([
+      "set_two_ints_perform_op",
+      "set_three_ints_perform_op",
+      "counted_sum_loop",
+      "read_two_ints",
+      "read_bounded_string",
+    ]);
+    for (let i = 0; i < 100; i++) {
+      const problem = generateProblem(i);
+      expect(problem.category).toBe(i % 2 === 0
+        ? "c_snippet_to_mips_easy"
+        : "mips_snippet_behavior_tracing_easy");
+      expect(normalTranslationFamilies.some((f) => f.id === problem.family)).toBe(false);
+    }
+    expect(LEGACY_CATEGORY.id).toBe("c_snippet_to_mips_legacy");
+  });
 });
 describe("trace oracles", () => {
   for (const f of tracingFamilies)

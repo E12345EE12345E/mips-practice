@@ -93,7 +93,15 @@ scores one point; skipping costs ten seconds. High scores are stored locally und
 remain at `/v1/` through a separate Vite HTML entry point.
 
 `src/problems/easy/translation.ts` and `tracing.ts` define the individual easy
-families and their independent numeric/byte oracles. `tests/unit/challenge.test.ts`
+families and their independent numeric/byte oracles. Easy translation reference
+solutions contain at most three nonblank lines, including labels. Longer families
+live in `src/problems/normal/translation.ts` under `c_snippet_to_mips_normal`:
+`set_two_ints_perform_op`, `set_three_ints_perform_op`, `counted_sum_loop`,
+`read_two_ints`, and `read_bounded_string`. These remain generatable and tested but
+are excluded from speedruns and currently unused by either interface. The original
+full-program generators belong to `c_snippet_to_mips_legacy` and serve `/v1/`.
+Shared snippet contracts live in `src/problems/snippets.ts`.
+`tests/unit/challenge.test.ts`
 executes reference solutions and checks trace oracles against the interpreter.
 Translation fragments must reach the supplied suffix; grading observes their
 outgoing registers/memory as well as final stdout. Input-dependent families run

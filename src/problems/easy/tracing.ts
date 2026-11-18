@@ -1,4 +1,4 @@
-import { base, type Family } from "./types";
+import { base, type Family } from "../snippets";
 const scalar = (
   id: string,
   code: (a: number, b: number) => string,

@@ -2,6 +2,7 @@ import { translationFamilies } from "./translation";
 import { tracingFamilies } from "./tracing";
 export { translationFamilies, tracingFamilies };
 export const CATEGORIES = [
+  "c_snippet_to_mips_legacy",
   "c_snippet_to_mips_normal",
   "c_snippet_to_mips_easy",
   "mips_snippet_behavior_tracing_easy",

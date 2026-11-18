@@ -1,7 +1,7 @@
 import { gradeFragment } from "./grade";
-import type { EasyProblem } from "../problems/easy/types";
+import type { SnippetProblem } from "../problems/snippets";
 self.onmessage = (
-  e: MessageEvent<{ problem: EasyProblem; source: string; revision: number }>,
+  e: MessageEvent<{ problem: SnippetProblem; source: string; revision: number }>,
 ) => {
   const { problem, source, revision } = e.data;
   try {

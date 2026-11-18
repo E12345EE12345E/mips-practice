@@ -1,8 +1,8 @@
 import { assemble } from "../mips/assembler";
 import { Machine } from "../mips/machine";
 import { TEXT_BASE } from "../mips/limits";
-import type { EasyProblem } from "../problems/easy/types";
-export function gradeFragment(p: EasyProblem, source: string) {
+import type { SnippetProblem } from "../problems/snippets";
+export function gradeFragment(p: SnippetProblem, source: string) {
   if (!source.trim()) return { passed: false, message: "" };
   const boundary = "__challenge_end";
   if (source.includes(boundary))

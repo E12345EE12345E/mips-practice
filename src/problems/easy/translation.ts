@@ -1,25 +1,4 @@
-import { base, type Family } from "./types";
-const arithmetic = (id: string, three: boolean): Family => ({
-  id,
-  generate(a, b) {
-    const p = base(id, a, b);
-    const k = 3;
-    const outer = ["-", "+", "*"][b % 3];
-    const inner = ["*", "+", "-"][(a + b) % 3];
-    const op = (x: number, y: number, o: string) =>
-      o === "+" ? x + y : o === "-" ? x - y : x * y;
-    const mnemonic: Record<string, string> = {
-      "+": "add",
-      "-": "sub",
-      "*": "mul",
-    };
-    p.cTarget = `    a = ${a};\n    b = ${b};\n${three ? "    int c = 3;\n" : ""}    a = b ${outer} (a ${inner} ${three ? "c" : k});`;
-    p.reference = `li $t0, ${a}\nli $t1, ${b}\nli $t2, 3\n${mnemonic[inner]} $t0, $t0, $t2\n${mnemonic[outer]} $t0, $t1, $t0`;
-    p.answer = op(b, op(a, k, inner), outer);
-    p.expectedOutput = String(p.answer);
-    return p;
-  },
-});
+import { base, type Family } from "../snippets";
 const simple = (
   id: string,
   c: (a: number, b: number) => string,
@@ -40,8 +19,6 @@ const simple = (
   },
 });
 export const translationFamilies: Family[] = [
-  arithmetic("set_two_ints_perform_op", false),
-  arithmetic("set_three_ints_perform_op", true),
   simple(
     "set_one_int",
     (_a, b) => `a = ${b};`,
@@ -91,13 +68,6 @@ export const translationFamilies: Family[] = [
     Math.min,
   ),
   simple(
-    "counted_sum_loop",
-    () => "a = 0;\n    for (int i = 0; i < 4; i++) a += i;",
-    () =>
-      "li $t0, 0\nli $t2, 0\nloop:\nadd $t0, $t0, $t2\naddi $t2, $t2, 1\nblt $t2, 4, loop",
-    () => 6,
-  ),
-  simple(
     "swap_two_ints",
     () => "int tmp = a;\n    a = b;\n    b = tmp;",
     () => "move $t2, $t0\nmove $t0, $t1\nmove $t1, $t2",
@@ -117,27 +87,22 @@ translationFamilies.push(
     () => "div $t0, $t1\nmfhi $t0",
     (a, b) => a % b,
   ),
-  ...["read_one_int", "read_two_ints"].map((id): Family => ({
-    id,
+  {
+    id: "read_one_int",
     generate(a, b) {
-      const p = base(id, a, b);
-      const two = id === "read_two_ints";
-      p.cTarget = two
-        ? '    scanf("%d %d", &a, &b);\n    a += b;'
-        : '    scanf("%d", &a);';
-      p.reference =
-        "li $v0, 5\nsyscall\nmove $t0, $v0" +
-        (two ? "\nli $v0, 5\nsyscall\nmove $t1, $v0\nadd $t0, $t0, $t1" : "");
+      const p = base("read_one_int", a, b);
+      p.cTarget = '    scanf("%d", &a);';
+      p.reference = "li $v0, 5\nsyscall\nmove $t0, $v0";
       p.cases = [0, 1, -7, 19].map((x) => ({
-        stdin: two ? `${x} ${b}` : String(x),
-        answer: two ? x + b : x,
-        output: String(two ? x + b : x),
+        stdin: String(x),
+        answer: x,
+        output: String(x),
       }));
-      p.answer = two ? a + b : a;
-      p.expectedOutput = String(p.answer);
+      p.answer = a;
+      p.expectedOutput = String(a);
       return p;
     },
-  })),
+  },
   ...["print_one_int", "print_one_char", "print_one_string"].map(
     (id): Family => ({
       id,
@@ -200,27 +165,6 @@ translationFamilies.push(
       return p;
     },
   })),
-  {
-    id: "read_bounded_string",
-    generate(a, b) {
-      const p = base("read_bounded_string", a, b);
-      p.data = ".data\ntext: .space 8";
-      p.cBefore = "int main() {\n    char text[8] = {0};";
-      p.cTarget = '    scanf("%7s", text);';
-      p.cAfter = '    printf("%s", text);\n    return 0;\n}';
-      p.label = "text → label text · capacity 8 bytes";
-      p.reference = "la $a0, text\nli $a1, 8\nli $v0, 8\nsyscall";
-      p.suffix = "la $a0, text\nli $v0, 4\nsyscall\nli $v0, 10\nsyscall";
-      p.register = 0;
-      p.answer = 0;
-      p.cases = ["a", "cat", "abcdefg", "abcdefghijk"].map((stdin) => ({
-        stdin,
-        answer: 0,
-        output: stdin.slice(0, 7),
-      }));
-      return p;
-    },
-  },
   {
     id: "call_leaf_one_arg",
     generate(a, b) {
