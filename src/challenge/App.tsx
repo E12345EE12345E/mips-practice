@@ -26,14 +26,19 @@ export function matchesScalarAnswer(problem: SnippetProblem, value: string) {
       value.charCodeAt(0) === problem.answer)
   );
 }
-function saved() {
+type Mode = "timed" | "endless";
+function scoreKey(mode: Mode) {
+  return mode === "timed" ? CONFIG.storageKey : CONFIG.endlessStorageKey;
+}
+function saved(mode: Mode) {
   try {
-    return Number(localStorage.getItem(CONFIG.storageKey)) || 0;
+    return Number(localStorage.getItem(scoreKey(mode))) || 0;
   } catch {
     return 0;
   }
 }
 export default function App() {
+  const [mode, setMode] = useState<Mode>("timed");
   const [phase, setPhase] = useState<
     | "home"
     | "starting"
@@ -47,10 +52,10 @@ export default function App() {
   const [source, setSource] = useState("");
   const [cells, setCells] = useState<string[]>([]);
   const [score, setScore] = useState(0);
-  const [high, setHigh] = useState(saved);
+  const [high, setHigh] = useState(() => saved("timed"));
   const [played, setPlayed] = useState(() => {
     try {
-      return localStorage.getItem(CONFIG.storageKey) !== null;
+      return localStorage.getItem(scoreKey("timed")) !== null;
     } catch {
       return false;
     }
@@ -59,6 +64,7 @@ export default function App() {
   const [message, setMessage] = useState("");
   const [skipSolution, setSkipSolution] = useState("");
   const live = useRef({
+    mode,
     phase,
     problem,
     revision: 0,
@@ -73,13 +79,15 @@ export default function App() {
   const scalar = useRef<HTMLInputElement | null>(null);
   const cellRefs = useRef<(HTMLInputElement | null)[]>([]);
   const finish = () => {
+    if (timer.current) clearTimeout(timer.current);
+    live.current.revision++;
     live.current.phase = "finished";
     setPhase("finished");
-    const best = Math.max(saved(), live.current.score);
+    const best = Math.max(saved(live.current.mode), live.current.score);
     setHigh(best);
     setPlayed(true);
     try {
-      localStorage.setItem(CONFIG.storageKey, String(best));
+      localStorage.setItem(scoreKey(live.current.mode), String(best));
     } catch {
       /* storage is optional */
     }
@@ -109,7 +117,7 @@ export default function App() {
     setPhase("solved");
     live.current.score++;
     setScore(live.current.score);
-    live.current.deadline += CONFIG.transitionMs;
+    if (live.current.mode === "timed") live.current.deadline += CONFIG.transitionMs;
     timer.current = setTimeout(next, CONFIG.transitionMs);
   };
   useEffect(() => {
@@ -156,7 +164,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     const id = setInterval(() => {
-      if (live.current.phase !== "playing") return;
+      if (live.current.phase !== "playing" || live.current.mode === "endless") return;
       const left = Math.max(
         0,
         (live.current.deadline - performance.now()) / 1000,
@@ -179,6 +187,7 @@ export default function App() {
     }
   }, [phase, problem]);
   const start = () => {
+    live.current.mode = mode;
     live.current.score = 0;
     live.current.index = 0;
     setScore(0);
@@ -186,9 +195,21 @@ export default function App() {
     live.current.phase = "starting";
     setPhase("starting");
     timer.current = setTimeout(() => {
-      live.current.deadline = performance.now() + CONFIG.seconds * 1000;
+      live.current.deadline = mode === "timed"
+        ? performance.now() + CONFIG.seconds * 1000
+        : Infinity;
       next();
     }, CONFIG.transitionMs);
+  };
+  const toggleMode = () => {
+    const nextMode = mode === "timed" ? "endless" : "timed";
+    setMode(nextMode);
+    setHigh(saved(nextMode));
+    try {
+      setPlayed(localStorage.getItem(scoreKey(nextMode)) !== null);
+    } catch {
+      setPlayed(false);
+    }
   };
   const edit = (value: string) => {
     if (live.current.phase !== "playing" || !problem) return;
@@ -229,6 +250,15 @@ export default function App() {
           </h1>
           <p className="intro">Think in instructions.</p>
           <button
+            className="mode-toggle"
+            type="button"
+            disabled={phase === "starting"}
+            onClick={toggleMode}
+            aria-label={`Mode: ${mode === "timed" ? "5 minutes" : "Endless"}. Switch mode`}
+          >
+            MODE: {mode === "timed" ? "5 MINUTES" : "ENDLESS"} ↔
+          </button>
+          <button
             className="start"
             disabled={phase === "starting"}
             onClick={start}
@@ -253,12 +283,14 @@ export default function App() {
           {played && <p>High Score: {high}</p>}
           <a href={`${import.meta.env.BASE_URL}v1/`}>Open legacy practice ↗</a>
           <p className="rules">
-            2 minutes · solve to advance · skip costs 10 seconds
+            {mode === "timed"
+              ? "5 minutes · solve to advance · skip costs 10 seconds"
+              : "No time limit · solve to advance · skip freely · end run to save"}
           </p>
         </section>
       ) : phase === "finished" ? (
         <section className="home">
-          <p className="eyebrow">TIME'S UP</p>
+          <p className="eyebrow">{mode === "timed" ? "TIME'S UP" : "RUN COMPLETE"}</p>
           <h1>{score}</h1>
           <p>Problems solved</p>
           <p>High Score: {high}</p>
@@ -273,9 +305,13 @@ export default function App() {
             <header>
               <a href={import.meta.env.BASE_URL}>MIPS Practice</a>
               <span>Score: {score}</span>
-              <strong className={remaining < 20 ? "urgent" : ""}>
-                {Math.ceil(remaining)}s
-              </strong>
+              {mode === "endless" ? (
+                <button className="end-run" onClick={finish}>End Run</button>
+              ) : (
+                <strong className={remaining < 20 ? "urgent" : ""}>
+                  {Math.ceil(remaining)}s
+                </strong>
+              )}
             </header>
             <section className="arena">
               <p className="eyebrow">
@@ -469,7 +505,8 @@ export default function App() {
                 disabled={phase !== "playing"}
                 onClick={() => {
                   if (phase !== "playing") return;
-                  live.current.deadline -= CONFIG.skipSeconds * 1000;
+                  if (live.current.mode === "timed")
+                    live.current.deadline -= CONFIG.skipSeconds * 1000;
                   live.current.phase = "skipped";
                   live.current.revision++;
                   live.current.pending = false;
@@ -481,8 +518,10 @@ export default function App() {
                         ? `${problem.snippet}\n# ${problem.label}: ${problem.answer.map((byte) => (byte === 0 ? "\\0" : byte === 10 ? "\\n" : byte === 9 ? "\\t" : byte === 13 ? "\\r" : byte === 92 ? "\\\\" : String.fromCharCode(byte))).join(" ")}`
                         : `${problem.snippet}\n# ${problem.label}: ${problem.answer}`;
                   setSkipSolution(answer);
-                  const expired = live.current.deadline <= performance.now();
-                  if (!expired) live.current.deadline += 2000;
+                  const expired = live.current.mode === "timed" &&
+                    live.current.deadline <= performance.now();
+                  if (!expired && live.current.mode === "timed")
+                    live.current.deadline += 2000;
                   timer.current = setTimeout(() => {
                     if (live.current.phase === "skipped") {
                       if (expired) finish();
@@ -491,7 +530,7 @@ export default function App() {
                   }, 2000);
                 }}
               >
-                Skip · −10s
+                {mode === "timed" ? "Skip · −10s" : "Skip"}
               </button>
               {phase === "skipped" && (
                 <div className="skip-solution pixel" role="status">

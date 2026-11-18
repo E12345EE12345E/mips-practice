@@ -587,3 +587,36 @@ mark {
     transition: none !important;
   }
 }
+
+.mode-toggle,
+.end-run {
+  border: 1px solid var(--border);
+  padding: 9px 16px;
+  background: var(--panel);
+  color: var(--context);
+  font-size: 14px;
+  letter-spacing: 0.09em;
+  transition: border-color 160ms, color 160ms, transform 160ms;
+}
+.mode-toggle {
+  margin: -17px 0 26px;
+  animation: rise-in 650ms 220ms backwards;
+}
+.mode-toggle:hover:not(:disabled),
+.end-run:hover {
+  transform: translateY(-2px);
+  border-color: var(--target);
+  color: var(--target);
+}
+.end-run {
+  margin-left: auto;
+}
+header:has(.end-run) span {
+  margin-left: 0;
+}
+@media (max-width: 700px) {
+  .end-run { font-size: 12px; padding: 7px 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mode-toggle { animation-duration: 0.01ms !important; }
+}

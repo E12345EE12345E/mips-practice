@@ -11,8 +11,9 @@ export const PALETTE = {
   focus: "#C6A0FF",
 } as const;
 export const CONFIG = {
-  seconds: 120000,
+  seconds: 300,
   skipSeconds: 10,
   transitionMs: 400,
   storageKey: "mips-practice:v2:score:1",
+  endlessStorageKey: "mips-practice:v2:endless:score:1",
 } as const;

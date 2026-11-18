@@ -86,10 +86,13 @@ Skipping reveals the reference code and result for two seconds before the next
 problem appears. Press Escape during a run to return to the menu without saving
 that run's score. Translation prompts include a fixed syscall reference table.
 
-The default entry point is a 2-minute challenge alternating C fragment translation
+The default entry point is a 5-minute challenge alternating C fragment translation
 and MIPS behavior tracing. Answers are checked as they change. Each correct answer
-scores one point; skipping costs ten seconds. High scores are stored locally under
-`mips-practice:v2:score:1`. The original practice environment and its saved drafts
+scores one point; skipping costs ten seconds. The start screen can switch to endless
+mode, where there is no countdown or skip penalty and End Run saves the score.
+Escape returns to the menu without saving either mode. High scores are stored
+separately under `mips-practice:v2:score:1` and
+`mips-practice:v2:endless:score:1`. The original practice environment and its saved drafts
 remain at `/v1/` through a separate Vite HTML entry point.
 
 `src/problems/easy/translation.ts` and `tracing.ts` define the individual easy
