@@ -5,7 +5,20 @@ import { takeSnapshot } from "../../src/mips/snapshot";
 import { build, execute, mainWith } from "./helpers";
 
 const readString = (capacity: number, data = "buf: .space 30") =>
-  mainWith(`  la $a0, buf\n  li $a1, ${capacity}\n  li $v0, 8\n  syscall\n  la $a0, buf\n  li $v0, 4\n  syscall`, data);
+  mainWith(
+    `  la $a0, buf\n  li $a1, ${capacity}\n  li $v0, 8\n  syscall\n  la $a0, buf\n  li $v0, 4\n  syscall`,
+    data,
+  );
+
+describe("syscall 12 (character read)", () => {
+  it("reads whitespace as a character and reports exhausted input", () => {
+    const source = mainWith("  li $v0, 12\n  syscall\n  move $t0, $v0");
+    const result = execute(source, "\nA");
+    expect(result.regs[8]).toBe(10);
+    expect(result.inputCursor).toBe(1);
+    expect(execute(source, "").fault?.kind).toBe("input-exhausted");
+  });
+});
 
 describe("syscall 8 (bounded token read)", () => {
   it("reads a token without a newline and terminates it", () => {
@@ -26,7 +39,9 @@ describe("syscall 8 (bounded token read)", () => {
   });
 
   it("skips leading whitespace and stops at whitespace", () => {
-    expect(execute(readString(30), "   \n\t word second\n").stdoutText).toBe("word");
+    expect(execute(readString(30), "   \n\t word second\n").stdoutText).toBe(
+      "word",
+    );
   });
 
   it("handles n = 1 (zero byte only) and n <= 0 (nothing)", () => {
@@ -42,7 +57,9 @@ describe("syscall 8 (bounded token read)", () => {
 
   it("treats premature EOF as a diagnostic", () => {
     expect(execute(readString(30), "").fault?.kind).toBe("input-exhausted");
-    expect(execute(readString(30), "   \n").fault?.kind).toBe("input-exhausted");
+    expect(execute(readString(30), "   \n").fault?.kind).toBe(
+      "input-exhausted",
+    );
   });
 
   it("accepts N-1 and N, rejects N+1 capacity for .space N, even with short input", () => {
@@ -59,13 +76,20 @@ describe("syscall 8 (bounded token read)", () => {
 
   it("handles exactly N-1 input and oversized input", () => {
     const data = "buf: .space 10";
-    expect(execute(readString(10, data), "a".repeat(9)).stdoutText).toBe("a".repeat(9));
-    expect(execute(readString(10, data), "b".repeat(50)).stdoutText).toBe("b".repeat(9));
+    expect(execute(readString(10, data), "a".repeat(9)).stdoutText).toBe(
+      "a".repeat(9),
+    );
+    expect(execute(readString(10, data), "b".repeat(50)).stdoutText).toBe(
+      "b".repeat(9),
+    );
   });
 
   it("detects a manual terminator stored at offset N", () => {
     const m = execute(
-      mainWith("  la $t0, buf\n  sb $zero, 10($t0)", "buf: .space 10\nnext: .space 10"),
+      mainWith(
+        "  la $t0, buf\n  sb $zero, 10($t0)",
+        "buf: .space 10\nnext: .space 10",
+      ),
     );
     expect(m.fault?.kind).toBe("allocation-escape");
   });
@@ -82,19 +106,29 @@ describe("syscall 8 (bounded token read)", () => {
 
   it("rejects buffers whose ownership cannot be established", () => {
     const m = execute(
-      mainWith("  li $a0, 0x10010000\n  li $a1, 5\n  li $v0, 8\n  syscall", "buf: .space 10"),
+      mainWith(
+        "  li $a0, 0x10010000\n  li $a1, 5\n  li $v0, 8\n  syscall",
+        "buf: .space 10",
+      ),
       "abc",
     );
     expect(m.fault?.kind).toBe("unowned-buffer");
   });
 
   it("reports missing termination on print string", () => {
-    const m = execute(mainWith("  la $a0, buf\n  li $v0, 4\n  syscall", "buf: .byte 65, 66, 67"));
+    const m = execute(
+      mainWith(
+        "  la $a0, buf\n  li $v0, 4\n  syscall",
+        "buf: .byte 65, 66, 67",
+      ),
+    );
     expect(m.fault?.kind).toBe("unterminated-string");
   });
 
   it("faults on null string pointers", () => {
-    expect(execute(mainWith("  li $a0, 0\n  li $v0, 4\n  syscall")).fault?.kind).toBe("invalid-access");
+    expect(
+      execute(mainWith("  li $a0, 0\n  li $v0, 4\n  syscall")).fault?.kind,
+    ).toBe("invalid-access");
   });
 });
 
@@ -110,19 +144,33 @@ describe("integer and character I/O", () => {
   });
 
   it("faults on exhausted or malformed integer input", () => {
-    expect(execute(mainWith("  li $v0, 5\n  syscall"), "").fault?.kind).toBe("input-exhausted");
-    expect(execute(mainWith("  li $v0, 5\n  syscall"), "abc").fault?.kind).toBe("bad-input");
-    expect(execute(mainWith("  li $v0, 5\n  syscall"), "99999999999").fault?.kind).toBe("bad-input");
+    expect(execute(mainWith("  li $v0, 5\n  syscall"), "").fault?.kind).toBe(
+      "input-exhausted",
+    );
+    expect(execute(mainWith("  li $v0, 5\n  syscall"), "abc").fault?.kind).toBe(
+      "bad-input",
+    );
+    expect(
+      execute(mainWith("  li $v0, 5\n  syscall"), "99999999999").fault?.kind,
+    ).toBe("bad-input");
   });
 
   it("prints characters and preserves exact bytes (no trailing newline)", () => {
-    const m = execute(mainWith("  li $a0, 0x41\n  li $v0, 11\n  syscall\n  li $a0, 58\n  li $v0, 11\n  syscall"));
+    const m = execute(
+      mainWith(
+        "  li $a0, 0x41\n  li $v0, 11\n  syscall\n  li $a0, 58\n  li $v0, 11\n  syscall",
+      ),
+    );
     expect(m.stdoutText).toBe("A:");
   });
 
   it("rejects unsupported syscalls and caps stdout", () => {
-    expect(execute(mainWith("  li $v0, 99\n  syscall")).fault?.kind).toBe("unsupported-syscall");
-    const loop = execute(".text\nmain:\n li $a0, 65\n li $v0, 11\nl: syscall\n b l");
+    expect(execute(mainWith("  li $v0, 99\n  syscall")).fault?.kind).toBe(
+      "unsupported-syscall",
+    );
+    const loop = execute(
+      ".text\nmain:\n li $a0, 65\n li $v0, 11\nl: syscall\n b l",
+    );
     expect(loop.fault?.kind).toBe("stdout-limit");
     expect(loop.stdoutBytes.length).toBe(16 * 1024);
   });
@@ -130,7 +178,12 @@ describe("integer and character I/O", () => {
 
 describe("snapshots", () => {
   it("reports registers, allocations, provenance and changed flags", () => {
-    const result = assemble(mainWith("  la $t0, buf\n  addiu $t0, $t0, 2\n  li $t1, 66\n  sb $t1, 0($t0)", "buf: .space 8\nptr: .word buf"));
+    const result = assemble(
+      mainWith(
+        "  la $t0, buf\n  addiu $t0, $t0, 2\n  li $t1, 66\n  sb $t1, 0($t0)",
+        "buf: .space 8\nptr: .word buf",
+      ),
+    );
     if (!result.ok) throw new Error("assemble");
     const machine = new Machine(result.program);
     const initial = takeSnapshot(machine);
@@ -152,7 +205,9 @@ describe("snapshots", () => {
   });
 
   it("steps source instructions from a fresh state", () => {
-    const program = build(".text\nmain:\n  li $t0, 100000\n  blt $t0, $t0, main\n  li $v0, 10\n  syscall");
+    const program = build(
+      ".text\nmain:\n  li $t0, 100000\n  blt $t0, $t0, main\n  li $v0, 10\n  syscall",
+    );
     const machine = new Machine(program);
     machine.stepSource();
     expect(machine.pc).toBe(2); // li expanded to lui+ori, both executed

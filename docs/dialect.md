@@ -88,6 +88,7 @@ This is what makes "wrote past the end of the buffer" a diagnosable error even w
 | 8 | Read string | **`scanf("%Ns")` semantics**, see below |
 | 10 | Exit | Success |
 | 11 | Print character | Low byte of `$a0` |
+| 12 | Read character | Next input byte (including whitespace) into `$v0` |
 | 17 | Exit with status | Status `$a0`; a nonzero status fails a graded case |
 
 Returning from `main` with `jr $ra` also ends the program, with status `$v0`.

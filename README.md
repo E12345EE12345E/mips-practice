@@ -82,6 +82,10 @@ MIT
 
 ## V2 challenge
 
+Skipping reveals the reference code and result for two seconds before the next
+problem appears. Press Escape during a run to return to the menu without saving
+that run's score. Translation prompts include a fixed syscall reference table.
+
 The default entry point is a 2-minute challenge alternating C fragment translation
 and MIPS behavior tracing. Answers are checked as they change. Each correct answer
 scores one point; skipping costs ten seconds. High scores are stored locally under

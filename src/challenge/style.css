@@ -123,6 +123,45 @@ header .urgent {
   padding: 29px;
   animation: appear 0.2s ease-out;
 }
+.translation-problem {
+  max-width: 1100px;
+}
+.translation-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(210px, 2fr);
+  gap: 28px;
+}
+.translation-columns > pre {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.syscall-reference {
+  border-left: 1px solid var(--border);
+  padding-left: 28px;
+}
+.syscall-reference table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--context);
+  font-size: 15px;
+  text-align: left;
+}
+.syscall-reference caption {
+  text-align: left;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.syscall-reference th,
+.syscall-reference td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.syscall-reference th:first-child,
+.syscall-reference td:first-child {
+  width: 60px;
+  color: var(--target);
+}
 pre {
   font:
     18px/1.8 "Courier New",
@@ -216,6 +255,26 @@ small {
   color: var(--muted);
   padding: 10px 18px;
 }
+.skip-solution {
+  max-width: 650px;
+  margin: 18px auto 0;
+  padding: 16px 20px;
+  text-align: left;
+  animation: skip-reveal 2s forwards;
+}
+.skip-solution pre {
+  color: var(--success);
+  font-size: 15px;
+}
+@keyframes skip-reveal {
+  0%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 .success {
   pointer-events: none;
   animation: success 0.4s forwards;
@@ -296,6 +355,16 @@ small {
   }
   .eyebrow {
     letter-spacing: 1px;
+  }
+}
+@media (max-width: 700px) {
+  .translation-columns {
+    grid-template-columns: 1fr;
+  }
+  .syscall-reference {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    padding: 16px 0 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {

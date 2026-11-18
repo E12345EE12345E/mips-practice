@@ -27,7 +27,13 @@ function saved() {
 }
 export default function App() {
   const [phase, setPhase] = useState<
-    "home" | "starting" | "playing" | "solved" | "settling" | "finished"
+    | "home"
+    | "starting"
+    | "playing"
+    | "solved"
+    | "skipped"
+    | "settling"
+    | "finished"
   >("home");
   const [problem, setProblem] = useState<EasyProblem | null>(null);
   const [source, setSource] = useState("");
@@ -43,6 +49,7 @@ export default function App() {
   });
   const [remaining, setRemaining] = useState<number>(CONFIG.seconds);
   const [message, setMessage] = useState("");
+  const [skipSolution, setSkipSolution] = useState("");
   const live = useRef({
     phase,
     problem,
@@ -77,6 +84,7 @@ export default function App() {
     setSource("");
     setCells(Array.isArray(p.answer) ? p.answer.map(() => "") : []);
     setMessage("");
+    setSkipSolution("");
     live.current.pending = false;
     live.current.phase = "playing";
     setPhase("playing");
@@ -115,6 +123,29 @@ export default function App() {
       if (timer.current) clearTimeout(timer.current);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key !== "Escape" ||
+        live.current.phase === "home" ||
+        live.current.phase === "finished"
+      )
+        return;
+      event.preventDefault();
+      if (timer.current) clearTimeout(timer.current);
+      live.current.revision++;
+      live.current.pending = false;
+      live.current.phase = "home";
+      live.current.problem = null;
+      live.current.score = 0;
+      setProblem(null);
+      setScore(0);
+      setSkipSolution("");
+      setPhase("home");
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
   useEffect(() => {
     const id = setInterval(() => {
       if (live.current.phase !== "playing") return;
@@ -247,15 +278,48 @@ export default function App() {
                   ? "TRANSLATE THE GOLD LINES"
                   : "TRACE THE GOLD INSTRUCTIONS"}
               </p>
-              <div className="problem pixel">
+              <div
+                className={`problem pixel ${problem.category === "c_snippet_to_mips_easy" ? "translation-problem" : ""}`}
+              >
                 {problem.category === "c_snippet_to_mips_easy" ? (
-                  <pre>
-                    {problem.cBefore}
-                    {"\n"}
-                    <mark>{problem.cTarget}</mark>
-                    {"\n"}
-                    {problem.cAfter}
-                  </pre>
+                  <div className="translation-columns">
+                    <pre>
+                      {problem.cBefore}
+                      {"\n"}
+                      <mark>{problem.cTarget}</mark>
+                      {"\n"}
+                      {problem.cAfter}
+                    </pre>
+                    <aside
+                      aria-label="Helpful syscalls"
+                      className="syscall-reference"
+                    >
+                      <table>
+                        <caption>SYSCALLS</caption>
+                        <thead>
+                          <tr>
+                            <th scope="col">$v0</th>
+                            <th scope="col">Function</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            [1, "print_int"],
+                            [4, "print_string"],
+                            [5, "read_int"],
+                            [8, "read_string"],
+                            [11, "print_char"],
+                            [12, "read_char"],
+                          ].map(([number, name]) => (
+                            <tr key={number}>
+                              <td>{number}</td>
+                              <td>{name}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </aside>
+                  </div>
                 ) : (
                   <>
                     <div className="columns">
@@ -394,13 +458,37 @@ export default function App() {
                 className="skip"
                 disabled={phase !== "playing"}
                 onClick={() => {
+                  if (phase !== "playing") return;
                   live.current.deadline -= CONFIG.skipSeconds * 1000;
-                  if (live.current.deadline <= performance.now()) finish();
-                  else next();
+                  live.current.phase = "skipped";
+                  live.current.revision++;
+                  live.current.pending = false;
+                  setPhase("skipped");
+                  const answer =
+                    problem.category === "c_snippet_to_mips_easy"
+                      ? problem.reference
+                      : Array.isArray(problem.answer)
+                        ? `${problem.snippet}\n# ${problem.label}: ${problem.answer.map((byte) => (byte === 0 ? "\\0" : byte === 10 ? "\\n" : byte === 9 ? "\\t" : byte === 13 ? "\\r" : byte === 92 ? "\\\\" : String.fromCharCode(byte))).join(" ")}`
+                        : `${problem.snippet}\n# ${problem.label}: ${problem.answer}`;
+                  setSkipSolution(answer);
+                  const expired = live.current.deadline <= performance.now();
+                  if (!expired) live.current.deadline += 2000;
+                  timer.current = setTimeout(() => {
+                    if (live.current.phase === "skipped") {
+                      if (expired) finish();
+                      else next();
+                    }
+                  }, 2000);
                 }}
               >
                 Skip · −10s
               </button>
+              {phase === "skipped" && (
+                <div className="skip-solution pixel" role="status">
+                  <small>INTENDED SOLUTION</small>
+                  <pre>{skipSolution}</pre>
+                </div>
+              )}
             </section>
           </>
         )

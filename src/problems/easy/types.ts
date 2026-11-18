@@ -37,7 +37,7 @@ export const base = (family: string, a: number, b: number): EasyProblem => ({
   suffix: "move $a0, $t0\nli $v0, 1\nsyscall\nli $v0, 10\nsyscall",
   snippet: "",
   stdin: "",
-  label: "a → $t0 · b → $t1 · scratch: $t2–$t7",
+  label: "a → $t0 · b → $t1",
   answer: 0,
   reference: "",
   expectedOutput: "",
