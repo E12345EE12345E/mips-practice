@@ -12,7 +12,7 @@ test("challenge starts, skips, expires and preserves high score", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Skip · −10s" }).click();
   await expect(page.getByText("TRACE THE GOLD INSTRUCTIONS")).toBeVisible();
-  for (let i = 0; i < 17; i++)
+  for (let i = 0; i < 11; i++)
     await page.getByRole("button", { name: "Skip · −10s" }).click();
   await expect(page.getByRole("button", { name: "Play Again" })).toBeVisible();
   await page.reload();

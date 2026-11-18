@@ -217,7 +217,7 @@ export default function App() {
           {played && <p>High Score: {high}</p>}
           <a href={`${import.meta.env.BASE_URL}v1/`}>Open legacy practice ↗</a>
           <p className="rules">
-            180 seconds · solve to advance · skip costs 10 seconds
+            2 minutes · solve to advance · skip costs 10 seconds
           </p>
         </section>
       ) : phase === "finished" ? (

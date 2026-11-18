@@ -82,7 +82,7 @@ MIT
 
 ## V2 challenge
 
-The default entry point is a 180-second challenge alternating C fragment translation
+The default entry point is a 2-minute challenge alternating C fragment translation
 and MIPS behavior tracing. Answers are checked as they change. Each correct answer
 scores one point; skipping costs ten seconds. High scores are stored locally under
 `mips-practice:v2:score:1`. The original practice environment and its saved drafts
