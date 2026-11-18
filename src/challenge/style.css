@@ -1,0 +1,311 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+textarea {
+  outline-offset: 6px;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+.challenge {
+  background: var(--background);
+  color: var(--text);
+  min-height: 100dvh;
+  font:
+    16px/1.6 "Courier New",
+    monospace;
+  padding: 24px;
+}
+.home {
+  min-height: calc(100dvh - 48px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--muted);
+}
+h1 {
+  font-size: clamp(56px, 9vw, 116px);
+  line-height: 0.95;
+  letter-spacing: -5px;
+  text-transform: uppercase;
+  margin: 30px 0;
+  text-shadow: 4px 4px 0 var(--border);
+  font-weight: 900;
+}
+h1 span {
+  color: var(--target);
+}
+.intro {
+  color: var(--context);
+  margin: 0 0 38px;
+}
+.start {
+  background: var(--target);
+  color: var(--background);
+  border: 0;
+  box-shadow: 6px 6px 0 var(--border);
+  padding: 16px 65px;
+  font-weight: bold;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+.start:hover {
+  background: var(--context);
+}
+a {
+  color: var(--muted);
+  font-size: 13px;
+}
+.home a {
+  margin-top: 36px;
+}
+.rules {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 32px;
+}
+header {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+header a {
+  margin-right: auto;
+  color: var(--target);
+  text-decoration: none;
+}
+header strong {
+  font-size: 24px;
+  color: var(--context);
+}
+header .urgent {
+  color: var(--error);
+}
+.arena {
+  max-width: 1200px;
+  margin: 40px auto;
+  text-align: center;
+}
+.pixel {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: 4px 4px 0 var(--border);
+}
+.problem {
+  max-width: 800px;
+  margin: 20px auto 30px;
+  text-align: left;
+  padding: 24px;
+  animation: appear 0.2s ease-out;
+}
+pre {
+  font:
+    15px/1.8 "Courier New",
+    monospace;
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--context);
+}
+mark {
+  background: transparent;
+  color: var(--target);
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.columns pre + pre {
+  border-left: 1px solid var(--border);
+  padding-left: 24px;
+}
+.console {
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  padding-top: 12px;
+  color: var(--text);
+}
+small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+.code-row {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr 1fr;
+  gap: 20px;
+  text-align: left;
+}
+.code-row aside {
+  padding: 16px;
+  align-self: start;
+}
+.code-row small {
+  margin-bottom: 12px;
+}
+.code-row textarea {
+  min-height: 270px;
+  resize: vertical;
+  background: var(--panel);
+  color: var(--target);
+  border: 2px solid var(--target);
+  padding: 18px;
+  line-height: 1.6;
+  tab-size: 4;
+}
+.contract {
+  font-size: 12px;
+  color: var(--context);
+}
+.trace-answer {
+  display: inline-block;
+  padding: 24px;
+  min-width: 280px;
+}
+.trace-answer input {
+  display: block;
+  background: var(--background);
+  border: 1px solid var(--target);
+  color: var(--target);
+  padding: 12px;
+  max-width: 230px;
+  margin: 12px auto 0;
+  text-align: center;
+}
+.cells {
+  display: flex;
+  gap: 7px;
+  margin: 12px 0;
+}
+.cells input {
+  width: 48px;
+  padding: 12px 2px;
+}
+.status {
+  min-height: 26px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.skip {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 8px 15px;
+}
+.success {
+  pointer-events: none;
+  animation: success 0.4s forwards;
+}
+.success textarea,
+.success input {
+  color: var(--success);
+  border-color: var(--success);
+}
+.particles {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+}
+.particles i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--target);
+  animation: burst 0.4s forwards;
+}
+.starting > *:not(.particles) {
+  animation: fade 0.2s forwards;
+}
+@keyframes burst {
+  to {
+    transform: translate(var(--x), var(--y));
+    opacity: 0;
+  }
+}
+@keyframes fade {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes success {
+  to {
+    opacity: 0;
+    transform: translateY(50px);
+    color: var(--success);
+  }
+}
+@media (max-width: 800px) {
+  .challenge {
+    padding: 16px;
+  }
+  .code-row {
+    grid-template-columns: 1fr;
+  }
+  .code-row aside {
+    width: 100%;
+  }
+  .columns {
+    overflow: auto;
+    min-width: 0;
+  }
+  .columns pre {
+    min-width: 180px;
+    font-size: 12px;
+  }
+  .problem {
+    padding: 16px;
+  }
+  .cells {
+    gap: 3px;
+  }
+  .cells input {
+    width: 32px;
+  }
+  h1 {
+    letter-spacing: -3px;
+  }
+  .eyebrow {
+    letter-spacing: 1px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition: none !important;
+  }
+  .particles {
+    display: none;
+  }
+}

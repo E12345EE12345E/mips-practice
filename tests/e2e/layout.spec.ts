@@ -30,7 +30,7 @@ test("dividers resize with the keyboard", async ({ page }) => {
 
 test("narrow screens switch to tabs", async ({ page }) => {
   await page.setViewportSize({ width: 600, height: 900 });
-  await page.goto("/");
+  await page.goto("/v1/");
   const tabs = page.getByRole("tab");
   await expect(tabs).toHaveCount(3);
   await expect(page.getByTestId("c-snippet")).toBeVisible();

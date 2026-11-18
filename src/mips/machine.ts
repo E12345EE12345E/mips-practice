@@ -229,6 +229,7 @@ export class Machine {
       case "sra":
         this.touchReg(i.rt);
         return;
+      case "div":
       case "mult":
       case "multu":
         this.touchReg(i.rs);
@@ -291,6 +292,12 @@ export class Machine {
       case "mul":
         this.setReg(i.rd, Math.imul(a, b));
         break;
+      case "div": {
+        if (b === 0 || (a === INT_MIN && b === -1)) throw new MachineFault("arithmetic-overflow", "Invalid signed division");
+        this.writeLo(Math.trunc(a / b));
+        this.writeHi(a % b);
+        break;
+      }
       case "mult": {
         const p = BigInt(a) * BigInt(b);
         this.writeLo(Number(BigInt.asIntN(32, p)));
