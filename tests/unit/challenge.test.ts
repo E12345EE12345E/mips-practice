@@ -9,6 +9,24 @@ import { LEGACY_CATEGORY } from "../../src/problems/registry";
 import { gradeFragment } from "../../src/challenge/grade";
 import { assemble } from "../../src/mips/assembler";
 import { Machine } from "../../src/mips/machine";
+import { matchesScalarAnswer } from "../../src/challenge/App";
+describe("speedrun tracing prompts", () => {
+  const family = (id: string) => tracingFamilies.find((item) => item.id === id);
+  it("explains the initial bytes before the array declaration", () => {
+    for (const id of ["store_newline_in_array", "insert_null_terminator"]) {
+      const problem = family(id)!.generate(1, 1);
+      expect(problem.data).toContain("# 97:a  98:b  99:c  0:\\0\nbuffer: .byte");
+    }
+  });
+  it("omits character stores and accepts either answer format for pointer loads", () => {
+    expect(family("store_one_char_in_array")).toBeUndefined();
+    const problem = family("advance_char_pointer_load")!.generate(2, 1);
+    expect(matchesScalarAnswer(problem, "c")).toBe(true);
+    expect(matchesScalarAnswer(problem, "99")).toBe(true);
+    expect(matchesScalarAnswer(problem, "b")).toBe(false);
+    expect(matchesScalarAnswer(problem, "C")).toBe(false);
+  });
+});
 describe("translation references", () => {
   for (const f of [...translationFamilies, ...normalTranslationFamilies])
     it(f.id, () => {

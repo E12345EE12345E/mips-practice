@@ -105,7 +105,7 @@ export const tracingFamilies: Family[] = [
       const p = base(id, a, b);
       p.category = "mips_snippet_behavior_tracing_easy";
       p.label = "buffer[8]";
-      p.data = ".data\nbuffer: .byte 97, 98, 99, 0, 0, 0, 0, 0";
+      p.data = ".data\n# 97:a  98:b  99:c  0:\\0\nbuffer: .byte 97, 98, 99, 0, 0, 0, 0, 0";
       p.answer = [97, 98, 99, 0, 0, 0, 0, 0];
       if (id.startsWith("read_string")) {
         p.data = ".data\nbuffer: .space 8";
@@ -155,7 +155,6 @@ tracingFamilies.push(
     "load_signed_byte",
     "load_unsigned_byte",
     "advance_char_pointer_load",
-    "store_one_char_in_array",
     "store_word_constant_offset",
     "read_two_ints_perform_one_op",
     "call_leaf_return_value",
@@ -179,11 +178,6 @@ tracingFamilies.push(
         p.snippet = `li $t0, ${a}\nsw $t0, values+4`;
         p.label = "values[1]";
         p.answer = a;
-      } else if (id === "store_one_char_in_array") {
-        p.data = ".data\nbuffer: .byte 97, 98, 99, 0";
-        p.snippet = `la $t0, buffer\nli $t1, ${65 + a}\nsb $t1, 1($t0)`;
-        p.label = "buffer[4]";
-        p.answer = [97, 65 + a, 99, 0];
       } else if (id === "advance_char_pointer_load") {
         p.data = '.data\ntext: .asciiz "abcd"';
         p.snippet = `la $t0, text\naddi $t0, $t0, ${a % 4}\nlbu $t2, 0($t0)`;

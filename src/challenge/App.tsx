@@ -18,6 +18,14 @@ export function parseCell(s: string): number | null {
       ? s.charCodeAt(0)
       : null;
 }
+export function matchesScalarAnswer(problem: SnippetProblem, value: string) {
+  return (
+    (/^[+-]?\d+$/.test(value.trim()) && Number(value) === problem.answer) ||
+    (problem.family === "advance_char_pointer_load" &&
+      value.length === 1 &&
+      value.charCodeAt(0) === problem.answer)
+  );
+}
 function saved() {
   try {
     return Number(localStorage.getItem(CONFIG.storageKey)) || 0;
@@ -190,10 +198,7 @@ export default function App() {
     if (problem.category === "c_snippet_to_mips_easy") {
       live.current.pending = true;
       worker.current?.submit({ problem, source: value, revision });
-    } else if (
-      /^[+-]?\d+$/.test(value.trim()) &&
-      Number(value) === problem.answer
-    )
+    } else if (matchesScalarAnswer(problem, value))
       pass();
   };
   const editCell = (i: number, value: string) => {
@@ -338,6 +343,11 @@ export default function App() {
                             Reads a token; stores a null terminator, no newline.
                           </small>
                         )}
+                      </div>
+                    )}
+                    {problem.family === "advance_char_pointer_load" && (
+                      <div className="console">
+                        Answer for $t2: character or ASCII number.
                       </div>
                     )}
                   </>
