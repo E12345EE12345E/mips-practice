@@ -69,9 +69,10 @@ function ReferencePanel() {
 }
 
 export default function ProblemPanel({ session }: { session: Session }) {
-  const { view, problem, draftList, actions } = session;
+  const { view, problem, actions } = session;
   const [family, setFamily] = useState<string>("");
-  const [showBoilerplate, setShowBoilerplate] = useState(false);
+  const [showBoilerplate, setShowBoilerplate] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const copyC = async () => {
@@ -103,30 +104,6 @@ export default function ProblemPanel({ session }: { session: Session }) {
           <button type="button" className="primary" onClick={() => actions.newProblem(family || undefined)}>
             New problem
           </button>
-          {draftList.length > 0 ? (
-            <>
-              <label className="sr-only" htmlFor="draft-select">
-                Restore a saved draft
-              </label>
-              <select
-                id="draft-select"
-                value=""
-                onChange={(e) => {
-                  if (e.target.value) actions.restoreDraft(e.target.value);
-                }}
-              >
-                <option value="">Saved drafts…</option>
-                {draftList.map(([key, d]) => {
-                  const title = PROBLEM_TYPES.find((t) => t.id === d.typeId)?.title ?? d.typeId;
-                  return (
-                    <option key={key} value={key}>
-                      {title} · {new Date(d.savedAt).toLocaleTimeString()}
-                    </option>
-                  );
-                })}
-              </select>
-            </>
-          ) : null}
         </div>
       </header>
 
@@ -154,27 +131,41 @@ export default function ProblemPanel({ session }: { session: Session }) {
           </pre>
         </div>
 
-        <h2>Input</h2>
-        <ul>
-          {view.spec.inputConstraints.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-        <h2>Output</h2>
-        <p>{view.spec.outputDescription}</p>
-        {view.spec.notes.length > 0 ? (
+        <p>
+          <button
+            type="button"
+            className="mini-button"
+            aria-expanded={showDetails}
+            onClick={() => setShowDetails((v) => !v)}
+          >
+            {showDetails ? "Hide details" : "More details"}
+          </button>
+        </p>
+        {showDetails ? (
           <>
-            <h2>Notes</h2>
+            <h2>Input</h2>
             <ul>
-              {view.spec.notes.map((t) => (
+              {view.spec.inputConstraints.map((t) => (
                 <li key={t}>{t}</li>
               ))}
             </ul>
+            <h2>Output</h2>
+            <p>{view.spec.outputDescription}</p>
+            {view.spec.notes.length > 0 ? (
+              <>
+                <h2>Notes</h2>
+                <ul>
+                  {view.spec.notes.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+            <p className="mandatory" data-testid="no-error-checking">
+              {view.noErrorChecking}
+            </p>
           </>
         ) : null}
-        <p className="mandatory" data-testid="no-error-checking">
-          {view.noErrorChecking}
-        </p>
         <p className="note">
           Problem {problem.typeId} v{problem.typeVersion}
         </p>

@@ -32,17 +32,16 @@ function skipWhitespace(m: Machine): void {
 }
 
 export function executeSyscall(m: Machine): void {
-  const service = m.regs[REG.v0]!;
-  const a0 = m.regs[REG.a0]!;
+  const service = m.readReg(REG.v0);
 
   switch (service) {
     case 1: {
-      const text = String(a0);
+      const text = String(m.readReg(REG.a0));
       for (let i = 0; i < text.length; i++) m.writeStdout(text.charCodeAt(i));
       return;
     }
     case 4: {
-      const start = a0 >>> 0;
+      const start = m.readReg(REG.a0) >>> 0;
       const prov = m.provenance[REG.a0]!;
       const alloc = m.mem.check(start, 1, prov);
       const end = alloc.start + alloc.length;
@@ -73,14 +72,13 @@ export function executeSyscall(m: Machine): void {
       if (value < -2147483648 || value > 2147483647) {
         throw new MachineFault("bad-input", "Read integer: value does not fit in 32 bits");
       }
-      m.regs[REG.v0] = value;
-      m.provenance[REG.v0] = -1;
+      m.writeReg(REG.v0, value);
       return;
     }
     case 8: {
-      const capacity = m.regs[REG.a1]!;
+      const capacity = m.readReg(REG.a1);
       if (capacity <= 0) return; // writes nothing, consumes nothing
-      const dest = a0 >>> 0;
+      const dest = m.readReg(REG.a0) >>> 0;
       const prov = m.provenance[REG.a0]!;
       if (prov < 0) {
         throw new MachineFault(
@@ -128,10 +126,10 @@ export function executeSyscall(m: Machine): void {
       m.exit(0, "syscall-10");
       return;
     case 11:
-      m.writeStdout(a0 & 0xff);
+      m.writeStdout(m.readReg(REG.a0) & 0xff);
       return;
     case 17:
-      m.exit(a0, "syscall-17");
+      m.exit(m.readReg(REG.a0), "syscall-17");
       return;
     default:
       throw new MachineFault("unsupported-syscall", `Unsupported syscall service ${service}`);

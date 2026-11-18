@@ -44,6 +44,7 @@ test("narrow screens switch to tabs", async ({ page }) => {
 
 test("memory table view and number format are keyboard operable", async ({ page }) => {
   await openApp(page, "Bounded string echo");
+  await expect(page.getByRole("button", { name: "Table" })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "Table" }).click();
   await expect(page.getByRole("button", { name: "Table" })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "Hex" }).focus();
@@ -56,6 +57,7 @@ test("graph nodes can be dragged and pointers are drawn", async ({ page }) => {
   await setEditorText(page, echoProgram(20));
   await page.getByLabel("Sample input (stdin)").fill("hi");
   await page.getByRole("button", { name: "Final state" }).click();
+  await page.getByRole("button", { name: "Graph" }).click();
   const graph = page.getByTestId("memory-map");
   await expect(graph.locator(".react-flow__node").first()).toBeVisible();
   await expect(graph.locator(".react-flow__edge").first()).toBeAttached();

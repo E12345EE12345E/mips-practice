@@ -76,9 +76,15 @@ describe.each(PROBLEM_TYPES.map((p) => [p.id] as const))("generator invariants: 
     for (const seed of SEEDS.slice(0, 60)) {
       const params = entry.generateParams(deriveStream(seed, "params"));
       const view = viewProblem({ key: "k", typeId: id, typeVersion: entry.version, params, previewStdin: "" });
-      expect(countPrintf(view.program.full)).toBe(1);
+      const printfs = countPrintf(view.program.full);
       const bodyLines = view.program.body.split("\n");
-      expect(bodyLines[bodyLines.length - 1]).toMatch(/^\s*printf\(/);
+      if (id === "toggle-case") {
+        expect(printfs).toBe(2);
+        expect(bodyLines[bodyLines.length - 1]).toMatch(/^\s*\}/);
+      } else {
+        expect(printfs).toBe(1);
+        expect(bodyLines[bodyLines.length - 1]).toMatch(/^\s*printf\(/);
+      }
       expect(view.program.tail.split("\n")[0]).toBe("    return 0;");
       expect(view.program.full.trimEnd().endsWith("return 0;\n}")).toBe(true);
       expect(view.program.full).not.toContain(NO_ERROR_CHECKING_SENTENCE);
@@ -274,6 +280,21 @@ describe("toggle case suite", () => {
     expect(entry.validatePreviewInput({ n: 20, k: 2 }, "abc1")).toMatch(/letters/);
     expect(entry.validatePreviewInput({ n: 20, k: 2 }, "ab")).toMatch(/Length/);
     expect(entry.validatePreviewInput({ n: 20, k: 2 }, "abc")).toBeNull();
+  });
+
+  it("toggles with if/else rather than a ternary", () => {
+    expect(entry.renderBody({ n: 20, k: 3 })).toBe(
+      [
+        "    char text[20];",
+        '    scanf("%19s", text);',
+        "    char c = text[3];",
+        "    if (c >= 'a' && c <= 'z') {",
+        '        printf("%c", c - \'a\' + \'A\');',
+        "    } else {",
+        '        printf("%c", c - \'A\' + \'a\');',
+        "    }",
+      ].join("\n"),
+    );
   });
 });
 

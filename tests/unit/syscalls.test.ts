@@ -139,6 +139,9 @@ describe("snapshots", () => {
     const t0 = final.registers[8]!;
     expect(t0.provenance).toBe(1);
     expect(t0.changed).toBe(true);
+    expect(t0.used).toBe(true);
+    expect(t0.written).toBe(true);
+    expect(final.registers[10]!.used).toBe(false);
     const buf = final.allocations.find((a) => a.labels.includes("buf"))!;
     expect(buf.bytes[2]).toBe(66);
     expect(Array.from(buf.changed)).toEqual([0, 0, 1, 0, 0, 0, 0, 0]);

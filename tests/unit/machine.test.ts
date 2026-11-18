@@ -300,5 +300,29 @@ double:
     expect(m.fault?.kind).toBe("instruction-limit");
     expect(m.instructionCount).toBe(100_000);
   });
+});
 
+describe("register use tracking", () => {
+  it("marks only registers that were read or written during the run as used", () => {
+    const m = execute(mainWith("  li $t0, 1"));
+    expect(m.usedRegs[T0]).toBe(1);
+    expect(m.writtenRegs[T0]).toBe(1);
+    expect(m.usedRegs[T1]).toBe(0);
+    expect(m.writtenRegs[T1]).toBe(0);
+    expect(m.usedRegs[2]).toBe(1); // $v0: li 10 + syscall 10
+    expect(m.usedRegs[4]).toBe(0); // $a0 is not read by syscall 10
+    expect(m.usedRegs[29]).toBe(0); // $sp initialized, never accessed
+    expect(m.writtenRegs[29]).toBe(1);
+    expect(m.usedRegs[0]).toBe(0);
+  });
+
+  it("treats a source register as used even when it was never written", () => {
+    const m = execute(mainWith("  addu $t0, $t1, $t2"));
+    expect(m.usedRegs[T0]).toBe(1);
+    expect(m.writtenRegs[T0]).toBe(1);
+    expect(m.usedRegs[T1]).toBe(1);
+    expect(m.writtenRegs[T1]).toBe(0);
+    expect(m.usedRegs[T2]).toBe(1);
+    expect(m.writtenRegs[T2]).toBe(0);
+  });
 });

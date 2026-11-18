@@ -35,7 +35,11 @@ export const toggleCase: ProblemType<ToggleCaseParams> = {
       `    char text[${p.n}];`,
       `    scanf("%${p.n - 1}s", text);`,
       `    char c = text[${p.k}];`,
-      `    printf("%c", c >= 'a' && c <= 'z' ? c - 'a' + 'A' : c - 'A' + 'a');`,
+      `    if (c >= 'a' && c <= 'z') {`,
+      `        printf("%c", c - 'a' + 'A');`,
+      `    } else {`,
+      `        printf("%c", c - 'A' + 'a');`,
+      `    }`,
     ].join("\n");
   },
 

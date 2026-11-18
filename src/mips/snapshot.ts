@@ -15,6 +15,10 @@ export interface RegisterView {
   /** Allocation id the value is tracked as pointing into, or -1. */
   provenance: number;
   changed: boolean;
+  /** Read or written during this run (ABI init of $sp/$ra does not count). */
+  used: boolean;
+  /** Written, including ABI init of $sp/$ra. $zero is treated as defined. */
+  written: boolean;
 }
 
 export interface AllocationView {
@@ -47,6 +51,10 @@ export interface Snapshot {
   lo: number;
   hiChanged: boolean;
   loChanged: boolean;
+  hiUsed: boolean;
+  loUsed: boolean;
+  hiWritten: boolean;
+  loWritten: boolean;
   /** Address of the next instruction. */
   pc: number;
   /** Source line of the next instruction, or 0. */
@@ -87,6 +95,8 @@ export function takeSnapshot(machine: Machine, baseline?: Snapshot): Snapshot {
       value,
       provenance: machine.provenance[i]!,
       changed: baseline ? baseline.registers[i]!.value !== value : false,
+      used: machine.usedRegs[i] === 1,
+      written: i === 0 || machine.writtenRegs[i] === 1,
     });
   }
 
@@ -161,6 +171,10 @@ export function takeSnapshot(machine: Machine, baseline?: Snapshot): Snapshot {
     lo: machine.lo,
     hiChanged: baseline ? baseline.hi !== machine.hi : false,
     loChanged: baseline ? baseline.lo !== machine.lo : false,
+    hiUsed: machine.hiUsed,
+    loUsed: machine.loUsed,
+    hiWritten: machine.hiWritten,
+    loWritten: machine.loWritten,
     pc: TEXT_BASE + machine.pc * 4,
     pcLine: machine.status === "running" && next ? next.span.line : 0,
     allocations,

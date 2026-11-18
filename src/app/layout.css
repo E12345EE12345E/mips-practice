@@ -702,10 +702,6 @@ tr.changed {
   border: none;
 }
 
-.react-flow__attribution {
-  display: none;
-}
-
 /* ---------- Table view ---------- */
 
 .memory-table {
@@ -735,6 +731,17 @@ tr.changed {
   text-align: left;
   border-bottom: 1px solid var(--border);
   padding: 2px 8px;
+}
+
+.memory-table-toggle {
+  margin: 8px 0 0;
+}
+
+.uninit-value {
+  font-family: var(--mono);
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  user-select: none;
 }
 
 /* ---------- Editor column ---------- */

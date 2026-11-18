@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useRef, useState, type CSSProperties } from "react";
 import { useSession } from "../state/useSession";
 import DiagnosticsList from "./DiagnosticsList";
+import ErrorBoundary from "./ErrorBoundary";
 import PreviewControls from "./PreviewControls";
 import ProblemPanel from "./ProblemPanel";
 import ResizableDivider from "./ResizableDivider";
@@ -19,7 +20,7 @@ export default function App() {
   const session = useSession();
   const { actions, layout } = session;
   const [tab, setTab] = useState<Tab>("problem");
-  const [memoryView, setMemoryView] = useState<MemoryView>("graph");
+  const [memoryView, setMemoryView] = useState<MemoryView>("table");
   const appRef = useRef<HTMLDivElement | null>(null);
   const leftRef = useRef<HTMLDivElement | null>(null);
 
@@ -82,9 +83,15 @@ export default function App() {
             <div className="memory-content">
               {snapshot ? (
                 memoryView === "graph" ? (
-                  <Suspense fallback={<p className="note">Loading graph…</p>}>
-                    <MemoryMap snapshot={snapshot} numberFormat={session.numberFormat} resetKey={session.problem.key} />
-                  </Suspense>
+                  <ErrorBoundary
+                    resetKey={`${memoryView}:${session.problem.key}`}
+                    onFallback={() => setMemoryView("table")}
+                    fallbackLabel="Show table instead"
+                  >
+                    <Suspense fallback={<p className="note">Loading graph…</p>}>
+                      <MemoryMap snapshot={snapshot} numberFormat={session.numberFormat} resetKey={session.problem.key} />
+                    </Suspense>
+                  </ErrorBoundary>
                 ) : (
                   <MemoryTable snapshot={snapshot} numberFormat={session.numberFormat} />
                 )

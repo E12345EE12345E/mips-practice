@@ -8,11 +8,12 @@ test("loads without console errors and shows the mandatory sentence", async ({ p
     if (m.type() === "error") errors.push(m.text());
   });
   await openApp(page);
+  await page.getByRole("button", { name: "More details" }).click();
   await expect(page.getByTestId("no-error-checking")).toContainText(
     "No error checking is needed outside the stated specifications.",
   );
   await expect(page.getByTestId("submission-panel")).toContainText(/\d+ hidden test cases?\./);
-  await expect(page.getByTestId("memory-map")).toBeVisible();
+  await expect(page.getByTestId("memory-table")).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -24,6 +25,8 @@ test("each family loads", async ({ page }) => {
     await page.getByLabel("Exercise family").selectOption({ label });
     await page.getByRole("button", { name: "New problem" }).click();
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(label);
+    const more = page.getByRole("button", { name: "More details" });
+    if (await more.isVisible()) await more.click();
     await expect(page.getByTestId("no-error-checking")).toBeVisible();
   }
 });
