@@ -30,19 +30,19 @@ import { asciiCell, formatByte, formatWord, hex32 } from "./format";
 import PointerEdge, { TONE_COLORS, type PointerEdgeType } from "./PointerEdge";
 
 // ---- Layout constants (fixed so handle positions can be computed) ----
-const CARD_W = 320;
-const CARD_HEADER_H = 48;
-const CARD_BAR_H = 32;
-const CARD_MORE_H = 30;
-const REG_W = 250;
-const REG_HEADER_H = 36;
-const REG_ROW_H = 24;
-const GAP = 28;
+const CARD_W = 384;
+const CARD_HEADER_H = 58;
+const CARD_BAR_H = 38;
+const CARD_MORE_H = 36;
+const REG_W = 300;
+const REG_HEADER_H = 43;
+const REG_ROW_H = 29;
+const GAP = 34;
 
 const GEOMETRY: Record<ViewMode, { cols: number; cellW: number; rowH: number; collapsedBytes: number; pageBytes: number; unit: number }> = {
-  bytes: { cols: 8, cellW: 36, rowH: 44, collapsedBytes: 32, pageBytes: 64, unit: 1 },
-  ascii: { cols: 12, cellW: 24, rowH: 34, collapsedBytes: 48, pageBytes: 96, unit: 1 },
-  words: { cols: 1, cellW: 288, rowH: 28, collapsedBytes: 64, pageBytes: 128, unit: 4 },
+  bytes: { cols: 8, cellW: 43, rowH: 53, collapsedBytes: 32, pageBytes: 64, unit: 1 },
+  ascii: { cols: 12, cellW: 29, rowH: 41, collapsedBytes: 48, pageBytes: 96, unit: 1 },
+  words: { cols: 1, cellW: 346, rowH: 34, collapsedBytes: 64, pageBytes: 128, unit: 4 },
 };
 
 interface CardUi {
@@ -461,7 +461,7 @@ function MemoryMapInner({ snapshot, numberFormat, resetKey }: MemoryMapProps) {
     auto.set(REGISTERS_NODE_ID, { x: 0, y: 0 });
 
     let y = 0;
-    const cardColumnX = REG_W + 130;
+    const cardColumnX = REG_W + 156;
     const dataCards = model.cards.filter((c) => c.kind === "data");
     const stackCard = model.cards.find((c) => c.kind === "stack");
     for (const card of [...dataCards, ...(stackCard ? [stackCard] : [])]) {
@@ -493,7 +493,7 @@ function MemoryMapInner({ snapshot, numberFormat, resetKey }: MemoryMapProps) {
     }
 
     let codeY = 0;
-    const codeX = cardColumnX + CARD_W + 110;
+    const codeX = cardColumnX + CARD_W + 132;
     for (const target of model.codeTargets) {
       auto.set(target.nodeId, { x: codeX, y: codeY });
       built.push({

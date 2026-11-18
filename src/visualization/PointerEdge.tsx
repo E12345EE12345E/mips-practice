@@ -32,7 +32,7 @@ export default function PointerEdge(props: EdgeProps<PointerEdgeType>) {
   const color = TONE_COLORS[tone];
   const dashed = tone !== "tracked";
   const opacity = emphasis === "dim" ? 0.2 : 1;
-  const width = emphasis === "highlight" ? 3 : 1.75;
+  const width = emphasis === "highlight" ? 3.6 : 2.1;
 
   return (
     <>
@@ -43,7 +43,7 @@ export default function PointerEdge(props: EdgeProps<PointerEdgeType>) {
         style={{
           stroke: color,
           strokeWidth: width,
-          strokeDasharray: dashed ? "6 4" : undefined,
+          strokeDasharray: dashed ? "7 5" : undefined,
           opacity,
         }}
       />

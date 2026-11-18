@@ -35,7 +35,7 @@ export default function AssemblyEditor({ docKey, value, onChange, diagnostics, c
       theme: MIPS_THEME,
       automaticLayout: true,
       fontFamily: '"Cascadia Code", "Fira Code", Consolas, "Courier New", monospace',
-      fontSize: 14,
+      fontSize: 17,
       lineNumbers: "on",
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
@@ -49,7 +49,7 @@ export default function AssemblyEditor({ docKey, value, onChange, diagnostics, c
       suggestOnTriggerCharacters: true,
       accessibilitySupport: "auto",
       ariaLabel: "MIPS assembly editor",
-      padding: { top: 8 },
+      padding: { top: 10 },
       smoothScrolling: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       cursorSmoothCaretAnimation: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "off" : "on",
     });
