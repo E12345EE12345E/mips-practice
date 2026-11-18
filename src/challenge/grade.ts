@@ -13,6 +13,8 @@ export function gradeFragment(p: SnippetProblem, source: string) {
   if (!assembled.ok)
     return { passed: false, message: assembled.diagnostics[0]?.message ?? "" };
   const target = assembled.program.symbols.find((s) => s.name === boundary)!;
+  const firstAnswerLine = `${p.data}\n${p.prefix}\n`.split("\n").length;
+  const answerLines = source.split("\n");
   for (const test of p.cases ?? [
     { stdin: p.stdin, answer: p.answer, output: p.expectedOutput },
   ]) {
@@ -20,9 +22,20 @@ export function gradeFragment(p: SnippetProblem, source: string) {
       input: test.stdin,
       maxInstructions: 10000,
     });
-    while (m.status === "running" && TEXT_BASE + m.pc * 4 !== target.address)
+    let usedRequiredInstruction = !p.requiredInstruction?.length;
+    while (m.status === "running" && TEXT_BASE + m.pc * 4 !== target.address) {
+      const instruction = assembled.program.instructions[m.pc];
+      const line = instruction ? answerLines[instruction.span.line - firstAnswerLine] : undefined;
+      // Inspect the original mnemonic so pseudo-instructions such as li do not
+      // accidentally count as arithmetic after assembler expansion.
+      const mnemonic = line?.replace(/^(?:\s*[\w.$]+:\s*)*/, "")
+        .trim().split(/[\s,]+/)[0].toLowerCase();
+      if (mnemonic && p.requiredInstruction?.includes(mnemonic))
+        usedRequiredInstruction = true;
       m.step();
+    }
     if (m.status !== "running") return { passed: false, message: "" };
+    if (!usedRequiredInstruction) return { passed: false, message: "" };
     if (typeof test.answer === "number" && m.regs[p.register] !== test.answer)
       return { passed: false, message: "" };
     if (

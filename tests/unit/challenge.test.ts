@@ -45,6 +45,33 @@ describe("translation references", () => {
       }
     });
 });
+describe("minimal executed instruction requirements", () => {
+  const problem = (id: string, a: number, b: number) =>
+    translationFamilies.find((f) => f.id === id)!.generate(a, b);
+  it("rejects constant-only arithmetic and unexecuted instructions", () => {
+    const p = problem("update_one_int", 10, 12);
+    expect(gradeFragment(p, "li $t0, 22").passed).toBe(false);
+    expect(gradeFragment(p, "li $t0, 22 # add $t0, $t0, $t1").passed).toBe(false);
+    expect(gradeFragment(p, "b done\nadd $t0, $t0, $t1\ndone:\nli $t0, 22").passed).toBe(false);
+    expect(gradeFragment(p, "answer: addiu $t0, $t0, 12").passed).toBe(true);
+    const compound = problem("set_two_ints_perform_op", 5, 10);
+    expect(gradeFragment(compound, `li $t0, ${compound.answer}`).passed).toBe(false);
+    expect(gradeFragment(compound, compound.reference).passed).toBe(true);
+  });
+  it("requires division results to be read even when the initial value matches", () => {
+    for (const [id, a, b, read] of [
+      ["divide_two_ints_quotient", 10, 1, "mflo"],
+      ["divide_two_ints_remainder", 5, 12, "mfhi"],
+    ] as const) {
+      const p = problem(id, a, b);
+      expect(gradeFragment(p, "div $t0, $t1").passed).toBe(false);
+      expect(gradeFragment(p, `div $t0, $t1\n${read} $t0`).passed).toBe(true);
+    }
+    const p = problem("divide_two_ints_remainder", 19, 2);
+    expect(gradeFragment(p, "div $t0, $t1\nmfhi $t2").passed).toBe(false);
+    expect(gradeFragment(p, "div $t0, $t1\nmfhi $t2\nmove $t0, $t2").passed).toBe(true);
+  });
+});
 describe("translation difficulty pools", () => {
   it("keeps easy references short except the requested two-int arithmetic family", () => {
     const ids = [...translationFamilies, ...normalTranslationFamilies].map((f) => f.id);

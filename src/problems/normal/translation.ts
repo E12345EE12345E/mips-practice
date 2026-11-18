@@ -1,3 +1,4 @@
+import { arithmeticInstructions } from "../translationRequirements";
 import { base as snippetBase, type Family } from "../snippets";
 
 const base: typeof snippetBase = (family, a, b) => ({
@@ -11,6 +12,7 @@ const setThreeIntsPerformOp: Family = {
     const p = base("set_three_ints_perform_op", a, b);
     const k = 3;
     const outer = ["-", "+", "*"][b % 3];
+    p.requiredInstruction = arithmeticInstructions[outer];
     const inner = ["*", "+", "-"][(a + b) % 3];
     const op = (x: number, y: number, o: string) =>
       o === "+" ? x + y : o === "-" ? x - y : x * y;

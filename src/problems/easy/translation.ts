@@ -1,9 +1,11 @@
+import { arithmeticInstructions } from "../translationRequirements";
 import { base, type Family } from "../snippets";
 const setTwoIntsPerformOp: Family = {
   id: "set_two_ints_perform_op",
   generate(a, b) {
     const p = base("set_two_ints_perform_op", a, b);
     const outer = ["-", "+", "*"][b % 3];
+    p.requiredInstruction = arithmeticInstructions[outer];
     const inner = ["*", "+", "-"][(a + b) % 3];
     const op = (x: number, y: number, operator: string) =>
       operator === "+" ? x + y : operator === "-" ? x - y : x * y;

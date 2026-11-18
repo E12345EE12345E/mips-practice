@@ -1,3 +1,4 @@
+import { translationRequirements } from "./translationRequirements";
 export type SnippetCategory =
   | "c_snippet_to_mips_easy"
   | "c_snippet_to_mips_normal"
@@ -22,6 +23,8 @@ export interface SnippetProblem {
   reference: string;
   expectedOutput: string;
   register: number;
+  /** At least one of these source instructions must execute in the answer. */
+  requiredInstruction?: readonly string[];
 }
 export type Family = {
   id: string;
@@ -44,4 +47,5 @@ export const base = (family: string, a: number, b: number): SnippetProblem => ({
   reference: "",
   expectedOutput: "",
   register: 8,
+  requiredInstruction: translationRequirements[family],
 });

@@ -110,6 +110,10 @@ executes reference solutions and checks trace oracles against the interpreter.
 Translation fragments must reach the supplied suffix; grading observes their
 outgoing registers/memory as well as final stdout. Input-dependent families run
 multiple cases. The grader worker bounds execution and coalesces pending edits.
+Where needed, a family also requires one executed instruction from an allowed
+group in the submitted fragment (for example, an addition or a division result
+read). This prevents constant-only shortcuts without prescribing a full solution.
+Comments, skipped instructions, and the supplied surrounding code do not count.
 
 The palette and game settings live in `src/challenge/palette.ts`. The interface
 supports reduced motion, keyboard focus, scalar answers and byte cells with
