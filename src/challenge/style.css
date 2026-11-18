@@ -260,20 +260,16 @@ small {
   margin: 18px auto 0;
   padding: 16px 20px;
   text-align: left;
-  animation: skip-reveal 2s forwards;
+}
+.skip-solution.closing {
+  animation: skip-exit 0.4s forwards;
 }
 .skip-solution pre {
   color: var(--success);
   font-size: 15px;
 }
-@keyframes skip-reveal {
-  0%,
-  75% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+@keyframes skip-exit {
+  to { opacity: 0; transform: translateY(28px); }
 }
 .success {
   pointer-events: none;

@@ -45,6 +45,7 @@ export default function App() {
     | "playing"
     | "solved"
     | "skipped"
+    | "skipping"
     | "settling"
     | "finished"
   >("home");
@@ -69,6 +70,7 @@ export default function App() {
     problem,
     revision: 0,
     deadline: 0,
+    pausedAt: 0,
     index: 0,
     score: 0,
     pending: false,
@@ -164,13 +166,16 @@ export default function App() {
   }, []);
   useEffect(() => {
     const id = setInterval(() => {
-      if (live.current.phase !== "playing" || live.current.mode === "endless") return;
+      if (
+        !["playing", "skipping"].includes(live.current.phase) ||
+        live.current.mode === "endless"
+      ) return;
       const left = Math.max(
         0,
         (live.current.deadline - performance.now()) / 1000,
       );
       setRemaining(left);
-      if (left === 0) {
+      if (left === 0 && live.current.phase === "playing") {
         if (live.current.pending) {
           live.current.phase = "settling";
           setPhase("settling");
@@ -190,6 +195,7 @@ export default function App() {
     live.current.mode = mode;
     live.current.score = 0;
     live.current.index = 0;
+    live.current.pausedAt = 0;
     setScore(0);
     setRemaining(CONFIG.seconds);
     live.current.phase = "starting";
@@ -502,11 +508,30 @@ export default function App() {
               </p>
               <button
                 className="skip"
-                disabled={phase !== "playing"}
+                disabled={phase !== "playing" && phase !== "skipped"}
                 onClick={() => {
+                  if (phase === "skipped") {
+                    if (live.current.mode === "timed")
+                      live.current.deadline += performance.now() - live.current.pausedAt;
+                    live.current.pausedAt = 0;
+                    live.current.phase = "skipping";
+                    setPhase("skipping");
+                    timer.current = setTimeout(() => {
+                      if (live.current.phase !== "skipping") return;
+                      if (
+                        live.current.mode === "timed" &&
+                        live.current.deadline <= performance.now()
+                      ) finish();
+                      else next();
+                    }, CONFIG.transitionMs);
+                    return;
+                  }
                   if (phase !== "playing") return;
                   if (live.current.mode === "timed")
                     live.current.deadline -= CONFIG.skipSeconds * 1000;
+                  live.current.pausedAt = performance.now();
+                  if (live.current.mode === "timed")
+                    setRemaining(Math.max(0, (live.current.deadline - live.current.pausedAt) / 1000));
                   live.current.phase = "skipped";
                   live.current.revision++;
                   live.current.pending = false;
@@ -518,22 +543,12 @@ export default function App() {
                         ? `${problem.snippet}\n# ${problem.label}: ${problem.answer.map((byte) => (byte === 0 ? "\\0" : byte === 10 ? "\\n" : byte === 9 ? "\\t" : byte === 13 ? "\\r" : byte === 92 ? "\\\\" : String.fromCharCode(byte))).join(" ")}`
                         : `${problem.snippet}\n# ${problem.label}: ${problem.answer}`;
                   setSkipSolution(answer);
-                  const expired = live.current.mode === "timed" &&
-                    live.current.deadline <= performance.now();
-                  if (!expired && live.current.mode === "timed")
-                    live.current.deadline += 2000;
-                  timer.current = setTimeout(() => {
-                    if (live.current.phase === "skipped") {
-                      if (expired) finish();
-                      else next();
-                    }
-                  }, 2000);
                 }}
               >
-                {mode === "timed" ? "Skip · −10s" : "Skip"}
+                {phase === "skipped" ? "Continue →" : mode === "timed" ? "Skip · −10s" : "Skip"}
               </button>
-              {phase === "skipped" && (
-                <div className="skip-solution pixel" role="status">
+              {(phase === "skipped" || phase === "skipping") && (
+                <div className={`skip-solution pixel ${phase === "skipping" ? "closing" : ""}`} role="status">
                   <small>INTENDED SOLUTION</small>
                   <pre>{skipSolution}</pre>
                 </div>

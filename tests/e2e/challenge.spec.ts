@@ -14,12 +14,14 @@ test("challenge starts, skips, expires and preserves high score", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Skip · −10s" }).click();
   await expect(page.getByText("INTENDED SOLUTION")).toBeVisible();
-  await page.clock.fastForward(2000);
+  const pausedTime = await page.locator("header strong").textContent();
+  await page.clock.fastForward(20_000);
+  await expect(page.getByText("INTENDED SOLUTION")).toBeVisible();
+  await expect(page.locator("header strong")).toHaveText(pausedTime!);
+  await page.getByRole("button", { name: "Continue →" }).click();
+  await page.clock.fastForward(400);
   await expect(page.getByText("TRACE THE GOLD INSTRUCTIONS")).toBeVisible();
-  for (let i = 0; i < 29; i++) {
-    await page.getByRole("button", { name: "Skip · −10s" }).click();
-    await page.clock.fastForward(2000);
-  }
+  await page.clock.fastForward(300_000);
   await expect(page.getByRole("button", { name: "Play Again" })).toBeVisible();
   await page.reload();
   await expect(page.getByText("High Score: 0")).toBeVisible();
@@ -42,6 +44,9 @@ test("endless mode has no clock, skips freely and saves only when ended", async 
   await page.getByRole("button", { name: "Skip", exact: true }).click();
   await expect(page.getByText("INTENDED SOLUTION")).toBeVisible();
   await expect(page.getByRole("button", { name: "End Run" })).toBeVisible();
+  await page.waitForTimeout(500);
+  await expect(page.getByText("INTENDED SOLUTION")).toBeVisible();
+  await page.getByRole("button", { name: "Continue →" }).click();
   await expect(page.getByLabel("$t2", { exact: true })).toBeVisible();
   await page.getByLabel("$t2", { exact: true }).fill("15");
   await expect(page.getByText("Score: 1", { exact: true })).toBeVisible();

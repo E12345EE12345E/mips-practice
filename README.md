@@ -82,8 +82,9 @@ MIT
 
 ## V2 challenge
 
-Skipping reveals the reference code and result for two seconds before the next
-problem appears. Press Escape during a run to return to the menu without saving
+Skipping pauses timed play and leaves the reference code and result visible until
+the player presses Continue. That resumes the timer and advances after a short fade.
+Press Escape during a run to return to the menu without saving
 that run's score. Translation prompts include a fixed syscall reference table.
 
 The default entry point is a 5-minute challenge alternating C fragment translation
