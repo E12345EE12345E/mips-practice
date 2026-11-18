@@ -20,6 +20,7 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
+    rolldownOptions: { input: { main: "index.html", legacy: "v1/index.html" } },
     sourcemap: false,
     chunkSizeWarningLimit: 6000,
   },

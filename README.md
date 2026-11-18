@@ -79,3 +79,24 @@ Pushes to `main` build and deploy to GitHub Pages. See [`docs/deployment.md`](do
 ## License
 
 MIT
+
+## V2 challenge
+
+The default entry point is a 180-second challenge alternating C fragment translation
+and MIPS behavior tracing. Answers are checked as they change. Each correct answer
+scores one point; skipping costs ten seconds. High scores are stored locally under
+`mips-practice:v2:score:1`. The original practice environment and its saved drafts
+remain at `/v1/` through a separate Vite HTML entry point.
+
+`src/problems/easy/translation.ts` and `tracing.ts` define the individual easy
+families and their independent numeric/byte oracles. `tests/unit/challenge.test.ts`
+executes reference solutions and checks trace oracles against the interpreter.
+Translation fragments must reach the supplied suffix; grading observes their
+outgoing registers/memory as well as final stdout. Input-dependent families run
+multiple cases. The grader worker bounds execution and coalesces pending edits.
+
+The palette and game settings live in `src/challenge/palette.ts`. The interface
+supports reduced motion, keyboard focus, scalar answers and byte cells with
+`\0`, `\n`, `\r`, `\t` and `\\` escapes. Syscall 8 retains the lab's token-reading
+semantics. Signed `div rs, rt` is now supported, with quotient in LO and remainder
+in HI; zero divisors and signed overflow fault.

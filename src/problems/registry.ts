@@ -17,3 +17,6 @@ export const PROBLEM_TYPES: readonly ProblemEntry[] = [
 export function getProblemType(id: string): ProblemEntry | undefined {
   return PROBLEM_TYPES.find((p) => p.id === id);
 }
+
+/** The legacy application exclusively consumes this category. */
+export const NORMAL_CATEGORY = { id: "c_snippet_to_mips_normal", families: PROBLEM_TYPES } as const;

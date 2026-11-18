@@ -120,7 +120,7 @@ main:
   });
 
   it("reports unsupported and unknown instructions clearly", () => {
-    expect(errorsOf(".text\nmain: div $t0, $t1")[0]).toMatch(/not supported/);
+    expect(errorsOf(".text\nmain: divu $t0, $t1")[0]).toMatch(/not supported/);
     expect(errorsOf(".text\nmain: mtlo $t0")[0]).toMatch(/not supported/);
     expect(errorsOf(".text\nmain: frobnicate $t0")[0]).toMatch(/Unknown instruction/);
     expect(errorsOf(".text\nmain: nop\n.macro foo")[0]).toMatch(/not supported/);

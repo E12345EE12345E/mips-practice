@@ -371,6 +371,7 @@ export const INSTRUCTIONS: InstrDef[] = [
   immediateOp("addi", "Add sign-extended 16-bit immediate; traps on overflow.", "addi", -32768, 32767),
   immediateOp("addiu", "Add sign-extended 16-bit immediate; wraps.", "addiu", -32768, 32767),
   arith3("mul", "Low 32 bits of rs * rt (no HI/LO). Immediate form uses $at.", "mul", null),
+  def("div", "Signed division: quotient in LO, remainder in HI.", [{ syntax: "div rs, rt", pattern: "r,r", expand: (o) => [P("div", 0, reg(o[0]), reg(o[1]))] }]),
   def("mult", "Signed 64-bit product into HI:LO.", [
     { syntax: "mult rs, rt", pattern: "r,r", expand: (o) => [P("mult", 0, reg(o[0]), reg(o[1]))] },
   ]),
@@ -484,7 +485,6 @@ export const INSTRUCTION_MAP: ReadonlyMap<string, InstrDef> = new Map(INSTRUCTIO
 
 /** Mnemonics that exist in real MIPS but are deliberately unsupported here. */
 export const UNSUPPORTED_MNEMONICS = new Set([
-  "div",
   "divu",
   "rem",
   "remu",

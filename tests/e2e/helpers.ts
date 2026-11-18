@@ -10,7 +10,7 @@ export async function setEditorText(page: Page, source: string): Promise<void> {
 }
 
 export async function openApp(page: Page, family?: string): Promise<void> {
-  await page.goto("/");
+  await page.goto("/v1/");
   await expect(page.getByTestId("c-snippet")).toBeVisible();
   await expect(page.locator(".monaco-editor").first()).toBeVisible();
   if (family) {

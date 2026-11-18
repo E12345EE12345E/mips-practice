@@ -41,6 +41,7 @@ export const OPS = [
   "sub",
   "subu",
   "mul",
+  "div",
   "mult",
   "multu",
   "mflo",

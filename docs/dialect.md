@@ -19,7 +19,7 @@ Real instructions and the common pseudo-instructions:
 ```
 lui li la move nop neg negu not
 add addu sub subu addi addiu
-mul mult multu mflo mfhi
+mul mult multu div mflo mfhi
 and or xor nor andi ori xori
 sll srl sra
 slt sltu slti sltiu
@@ -39,7 +39,7 @@ Notes:
 - `mult`/`multu` write `hi`/`lo`; read them with `mfhi`/`mflo`. `mul` writes only the low word to a register.
 - Instruction counts reported by the UI and used for the 100,000-instruction limit count *expanded* (normalized) instructions.
 
-Recognised but **not supported** (assembling them reports a clear diagnostic): `div divu rem remu mtlo mthi lh lhu sh sllv srlv srav jalr break eret mfc0 mtc0 lwc1 swc1 add.s sub.s mul.s div.s abs ulw usw seq sne sgt sge sle`.
+Recognised but **not supported** (assembling them reports a clear diagnostic): `divu rem remu mtlo mthi lh lhu sh sllv srlv srav jalr break eret mfc0 mtc0 lwc1 swc1 add.s sub.s mul.s div.s abs ulw usw seq sne sgt sge sle`.
 
 Loads and stores must be naturally aligned (`lw`/`sw` to a multiple of 4).
 
@@ -111,3 +111,5 @@ Returning from `main` with `jr $ra` also ends the program, with status `$v0`.
 | Diagnostics shown | 50 |
 
 Exceeding a limit is reported as a runtime fault, not a crash.
+
+Signed `div rs, rt` truncates toward zero, puts the quotient in LO and remainder in HI. Zero divisors and INT_MIN / -1 fault.
